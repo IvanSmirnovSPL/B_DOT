@@ -6,8 +6,9 @@
 #include "bdot.h"
 #include "math.h"
 //#include "config.h"
+#include "my_sensors.h" /* imu_data.h */
 //#include "globdefs.h"
-#define  M_PI 3.14159265358979323846
+
 
 
 
@@ -30,6 +31,12 @@ struct magnMoment_tau
 };
 
 */
+
+struct data_from_sensor
+{
+    struct vec w[SIZE_OF_IMU_VECTOR], b[SIZE_OF_IMU_VECTOR];
+    u32 time;
+};
 
 void make_conf(struct config_values* conf)
 {
@@ -88,9 +95,9 @@ void deg_to_rad(struct vec* w, s16 n_w)
     s64 i;
     for (i = 0; i < n_w; i++)
     {
-        w[i].x *= (M_PI / 180.0);
-        w[i].y *= (M_PI / 180.0);
-        w[i].z *= (M_PI / 180.0);
+        w[i].x *= (PI / 180.0);
+        w[i].y *= (PI / 180.0);
+        w[i].z *= (PI / 180.0);
     }
 }
 
@@ -136,12 +143,45 @@ void m_from_b_only (const struct vec* b, s16 n_b, u32 step,
     rez->tau = config.work_time_b_dot;
 }
 
-void calculate_magnetic_moment(struct vec* b, s16 n_b, struct vec* w, s16 n_w, u32 time, struct magnMoment_tau* mMt)
+s16 check_w_working(struct vec* w)
 {
+    if (w[0].x == ERROR_OF_W)
+    {
+
+        return 0;
+    }
+    return 1;
+}
+
+void get_data_from_sensors(struct data_from_sensor* dFS)
+{
+    imu_data_s imu;
+    imu_data_get(&imu);
+    s16 i;
+    for (i = 0; i < SIZE_OF_IMU_VECTOR; i++)
+    {
+        dFS->b[i].x = imu.magn[i].x; dFS->b[i].y = imu.magn[i].y; dFS->b[i].z = imu.magn[i].z;
+        dFS->w[i].x = imu.gyro[i].x; dFS->w[i].y = imu.gyro[i].y; dFS->w[i].z = imu.gyro[i].z;
+    }
+    dFS->time = imu.time[1] - imu.time[0];
+}
+
+void calculate_magnetic_moment(struct magnMoment_tau* mMt)
+{
+    struct data_from_sensor dataFromSensor;
+    get_data_from_sensors(&dataFromSensor);
     struct config_values conf;
     make_conf(&conf);
-    deg_to_rad(w, n_w);
-    m_from_b_and_w(b, n_b, w, n_w, conf, mMt);
-    //m_from_b_only (b, n_b, time, conf, mMt);
+    if (check_w_working(dataFromSensor.w) == 1)
+    {
+        //printf("from b and w\n");
+        deg_to_rad(dataFromSensor.w, SIZE_OF_IMU_VECTOR);
+        m_from_b_and_w(dataFromSensor.b, SIZE_OF_IMU_VECTOR, dataFromSensor.w, SIZE_OF_IMU_VECTOR, conf, mMt);
+    }
+    else
+    {
+        //printf("from b\n");
+        m_from_b_only (dataFromSensor.b, SIZE_OF_IMU_VECTOR, dataFromSensor.time, conf, mMt);
+    }
 }
 
