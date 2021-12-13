@@ -1,8 +1,6 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include "bdot.h"
-#include "config.h"
-#include "my_sensors.h"
+
 
 
 int main() {

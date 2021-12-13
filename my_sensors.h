@@ -6,6 +6,7 @@
 #define B_DOT_MY_SENSORS_H
 
 #include "globdefs.h"
+#include "bdot.h"
 
 #define SIZE_OF_IMU_VECTOR 10
 

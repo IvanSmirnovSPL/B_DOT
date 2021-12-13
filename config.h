@@ -17,7 +17,7 @@
 #define M_MAX_Y 0.1253914864729585 * 2
 #define M_MAX_Z 0.08568002662482765 * 2
 #define ERROR_OF_W 1E+7
-
+/*
 struct vec{
     f32 x, y, z;
 };
@@ -34,7 +34,7 @@ struct magnMoment_tau
     struct vec m;
     u32 tau;
 };
-
+*/
 
 #endif //BDOT_CONFIG_H
 

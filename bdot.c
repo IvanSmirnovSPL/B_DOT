@@ -6,16 +6,8 @@
 #include "bdot.h"
 #include "math.h"
 //#include "config.h"
-#include "my_sensors.h" /* imu_data.h */
+//#include "my_sensors.h" /* imu_data.h */
 //#include "globdefs.h"
-
-
-
-
-/*
-struct vec{
-    f32 x, y, z;
-};
 
 struct config_values
 {
@@ -24,13 +16,7 @@ struct config_values
     u64 work_time , work_time_b_dot;
 };
 
-struct magnMoment_tau
-{
-    struct vec m;
-    u32 tau;
-};
 
-*/
 
 struct data_from_sensor
 {
@@ -166,6 +152,13 @@ void get_data_from_sensors(struct data_from_sensor* dFS)
     dFS->time = imu.time[1] - imu.time[0];
 }
 
+void make_m_procent(struct magnMoment_tau* mMt, const struct config_values conf)
+{
+    mMt->m.x = mMt->m.x * 100 / conf.m_max.x;
+    mMt->m.y = mMt->m.y * 100 / conf.m_max.y;
+    mMt->m.z = mMt->m.z * 100 / conf.m_max.z;
+}
+
 void calculate_magnetic_moment(struct magnMoment_tau* mMt)
 {
     struct data_from_sensor dataFromSensor;
@@ -183,5 +176,6 @@ void calculate_magnetic_moment(struct magnMoment_tau* mMt)
         //printf("from b\n");
         m_from_b_only (dataFromSensor.b, SIZE_OF_IMU_VECTOR, dataFromSensor.time, conf, mMt);
     }
+    make_m_procent(mMt, conf);
 }
 
