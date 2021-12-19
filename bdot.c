@@ -5,16 +5,7 @@
 #include "stdio.h"
 #include "bdot.h"
 #include "math.h"
-//#include "config.h"
-//#include "my_sensors.h" /* imu_data.h */
-//#include "globdefs.h"
 
-struct config_values
-{
-    f32 tolerance, angle, speed;
-    struct vec m_max;
-    u64 work_time , work_time_b_dot;
-};
 
 
 
@@ -24,14 +15,26 @@ struct data_from_sensor
     u32 time;
 };
 
+
 void make_conf(struct config_values* conf)
 {
-    conf->m_max.x = M_MAX_X; conf->m_max.y = M_MAX_Y; conf->m_max.z = M_MAX_Z;
-    conf->angle = ANGLE;
-    conf->tolerance = TOLERANCE;
-    conf->speed = SPEED;
-    conf->work_time = WORK_TIME; conf->work_time_b_dot = WORK_TIME_B_DOT;
+    f32 value; u32 tmp; s8 name[50];
+    FILE* file; file = fopen("configuration.txt", "r");
+    while (fscanf(file, "%u%f%s", &tmp, &value, name) != EOF) {
+        switch (tmp)
+        {
+            case 1: conf->tolerance = value; break;
+            case 2: conf->angle = value; break;
+            case 3: conf->speed = value; break;
+            case 4:  conf->work_time = value; break;
+            case 5: conf->work_time_b_dot = value; break;
+            case 6: conf->m_max.x = value; break;
+            case 7: conf->m_max.y = value; break;
+            case 8: conf->m_max.z = value; break;
+        }
+    }
 }
+
 
 
 void weighted_moving_average(const struct vec* array, s16 n_a, struct vec* rez)
@@ -101,8 +104,7 @@ void scaling(struct vec* rez, struct vec m_max)
     rez->x *= K; rez->y *= K; rez->z *= K;
 }
 
-void m_from_b_and_w (const struct vec* b, s16 n_b, const struct vec* w, s16 n_w,
-        struct config_values config, struct magnMoment_tau* rez)
+void m_from_b_and_w (const struct vec* b, s16 n_b, const struct vec* w, s16 n_w, struct magnMoment_tau* rez)
 {
     struct vec b_avg, w_avg;
     weighted_moving_average(b, n_b, &b_avg);
@@ -115,8 +117,7 @@ void m_from_b_and_w (const struct vec* b, s16 n_b, const struct vec* w, s16 n_w,
     rez->tau = sqrt(tmp) < config.speed ? config.work_time : config.angle * 1000 / sqrt(tmp);
 }
 
-void m_from_b_only (const struct vec* b, s16 n_b, u32 step,
-                     struct config_values config, struct magnMoment_tau* rez)
+void m_from_b_only (const struct vec* b, s16 n_b, u32 step, struct magnMoment_tau* rez)
 {
     s16 n_1 = n_b / 2, n_2 = n_b - n_1;
     struct vec b_avg_1, b_avg_2;
@@ -152,30 +153,29 @@ void get_data_from_sensors(struct data_from_sensor* dFS)
     dFS->time = imu.time[1] - imu.time[0];
 }
 
-void make_m_procent(struct magnMoment_tau* mMt, const struct config_values conf)
+void make_m_percent(struct magnMoment_tau* mMt)
 {
-    mMt->m.x = mMt->m.x * 100 / conf.m_max.x;
-    mMt->m.y = mMt->m.y * 100 / conf.m_max.y;
-    mMt->m.z = mMt->m.z * 100 / conf.m_max.z;
+    mMt->m.x = mMt->m.x * 100 / config.m_max.x;
+    mMt->m.y = mMt->m.y * 100 / config.m_max.y;
+    mMt->m.z = mMt->m.z * 100 / config.m_max.z;
 }
 
-void calculate_magnetic_moment(struct magnMoment_tau* mMt)
+void calculate_magnetic_moment(struct magnMoment_tau* mMt, const s16 flag)
 {
     struct data_from_sensor dataFromSensor;
     get_data_from_sensors(&dataFromSensor);
-    struct config_values conf;
-    make_conf(&conf);
+    if (flag == 1) make_conf(&config);
     if (check_w_working(dataFromSensor.w) == 1)
     {
         //printf("from b and w\n");
         deg_to_rad(dataFromSensor.w, SIZE_OF_IMU_VECTOR);
-        m_from_b_and_w(dataFromSensor.b, SIZE_OF_IMU_VECTOR, dataFromSensor.w, SIZE_OF_IMU_VECTOR, conf, mMt);
+        m_from_b_and_w(dataFromSensor.b, SIZE_OF_IMU_VECTOR, dataFromSensor.w, SIZE_OF_IMU_VECTOR, mMt);
     }
     else
     {
         //printf("from b\n");
-        m_from_b_only (dataFromSensor.b, SIZE_OF_IMU_VECTOR, dataFromSensor.time, conf, mMt);
+        m_from_b_only (dataFromSensor.b, SIZE_OF_IMU_VECTOR, dataFromSensor.time, mMt);
     }
-    make_m_procent(mMt, conf);
+    make_m_percent(mMt);
 }
 
