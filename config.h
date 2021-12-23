@@ -1,0 +1,18 @@
+//
+// Created by iesm0 on 23.12.2021.
+//
+
+#ifndef B_DOT_CONFIG_H
+#define B_DOT_CONFIG_H
+
+#define TOLERANCE 100.0
+#define ANGLE 3.14159265358979323846 / 6
+#define SPEED 5.0
+#define WORK_TIME 500
+#define WORK_TIME_B_DOT 250
+#define M_MAX_X 0.1253914864729585 * 2
+#define M_MAX_Y 0.1253914864729585 * 2
+#define M_MAX_Z 0.08568002662482765 * 2
+
+
+#endif //B_DOT_CONFIG_H

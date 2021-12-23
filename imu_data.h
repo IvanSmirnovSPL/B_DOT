@@ -30,7 +30,7 @@ typedef struct {
 
 /* Данные измерений с lsm imu */
 typedef struct {
-    u32  time[2];  /* Время начала измерений и время после последнего измерения. миллисекунды */
+    unix_time_t  time[2];  /* Время начала измерений и время после последнего измерения. миллисекунды */
     gyro_data_s gyro[SIZE_OF_IMU_VECTOR];
     magn_data_s magn[SIZE_OF_IMU_VECTOR];
 } imu_data_s;
