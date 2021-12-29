@@ -3,4 +3,4 @@ project(B_DOT C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(B_DOT main.c bdot.c bdot.h imu_data.c imu_data.h)
+add_executable(B_DOT main.c bdot.c bdot.h imu_data.c imu_data.h test_functions.c test_functions.h)

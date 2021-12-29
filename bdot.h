@@ -52,7 +52,7 @@ struct vec b_field_last;
 struct data_from_sensor
 {
     struct vec w[SIZE_OF_IMU_VECTOR], b[SIZE_OF_IMU_VECTOR];
-    u32 time;
+    unix_time_t time;
 };
 
 /* result structure, contains magnetic moment in percent from maximum(m) [-100, 100]

@@ -21,10 +21,10 @@ f32 random_range(f32 min, f32 max)
 
 void imu_data_get(imu_data_s* imu)
 {
-    struct vec_ b_min, b_max; b_min.x = -0.1; b_min.y = -0.05; b_min.z = 0.9;
-    b_max.x = 0.1; b_max.y = 0.05; b_max.z = 1.1;
-    struct vec_ w_min, w_max; w_min.x = 0.9; w_min.y = 0.95; w_min.z = -0.05;
-    w_max.x = 1; w_max.y = 1.05; w_max.z = 0.05;
+    struct vec_ b_min, b_max; b_min.x = 0; b_min.y = -0.05; b_min.z = 1;
+    b_max.x = 0; b_max.y = -0.05; b_max.z = 1;
+    struct vec_ w_min, w_max; w_min.x = 1; w_min.y = 1.05; w_min.z = 0.045;
+    w_max.x = 1; w_max.y = 1.05; w_max.z = 0.045;
     s16 i;
     struct  vec_ b[10], w[10];
     for (i = 0; i < 10; i++)
