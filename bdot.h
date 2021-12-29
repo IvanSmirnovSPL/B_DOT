@@ -91,8 +91,10 @@ void m_from_b_and_w (const struct vec* b, s16 n_b, const struct vec* w, s16 n_w,
  * - rez -- magnetic moment and its duration*/
 
 
-void make_m_percent(struct magnMoment_tau* mMt);
+void make_m_percent(struct magnMoment_tau* mMt, struct vec m_max);
 /* determine percent of supplied magnetic moment from maximum
+ * Input:
+ * - m_max -- [A*m^2] array of magnetic moment maximums
  * Output:
  * - mMt -- structure consisting of magnetic moment array (m) [%]
  * and duration of working (tau) [ms]

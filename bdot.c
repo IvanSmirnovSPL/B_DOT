@@ -119,7 +119,7 @@ void m_from_b_only (const struct vec* b, s16 n_b, unix_time_t step, struct magnM
 
 s16 check_w_working(struct vec* w)
 {
-    if (ABS(ERROR_OF_W - w[0].x) < EPSILON)
+    if (fabs(ERROR_OF_W - w[0].x) < EPSILON)
     {
 
         return 0;
@@ -141,11 +141,11 @@ void get_data_from_sensors(struct data_from_sensor* dFS)
     dFS->time = imu.time[1] - imu.time[0];
 }
 
-void make_m_percent(struct magnMoment_tau* mMt)
+void make_m_percent(struct magnMoment_tau* mMt, struct vec m_max)
 {
-    mMt->m.x = mMt->m.x * 100 / config.m_max.x;
-    mMt->m.y = mMt->m.y * 100 / config.m_max.y;
-    mMt->m.z = mMt->m.z * 100 / config.m_max.z;
+    mMt->m.x = mMt->m.x * 100 / m_max.x;
+    mMt->m.y = mMt->m.y * 100 / m_max.y;
+    mMt->m.z = mMt->m.z * 100 / m_max.z;
 }
 
 void calculate_magnetic_moment(struct magnMoment_tau* mMt, const s16 flag)
@@ -168,6 +168,6 @@ void calculate_magnetic_moment(struct magnMoment_tau* mMt, const s16 flag)
         //printf("from b\n");
         m_from_b_only (dataFromSensor.b, SIZE_OF_IMU_VECTOR, dataFromSensor.time, mMt);
     }
-    make_m_percent(mMt);
+    make_m_percent(mMt, config.m_max);
 }
 

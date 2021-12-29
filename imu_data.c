@@ -46,5 +46,5 @@ void imu_data_get(imu_data_s* imu)
         imu->gyro[i].x = w[i].x; imu->gyro[i].y = w[i].y; imu->gyro[i].z = w[i].z;
     }
     imu->time[0] = 100; imu->time[1] = 200;
-    imu->gyro[0].x = ERROR_OF_W;
+    //imu->gyro[0].x = ERROR_OF_W;
 }
